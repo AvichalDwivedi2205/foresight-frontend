@@ -50,7 +50,7 @@ export default function FilterTabs({ onFilterChange }: FilterTabsProps) {
         ))}
       </div>
       
-      {/* Mobile filter dropdown (appears on smaller screens) */}
+      {/* Mobile filter dropdown */}
       <div className="md:hidden mt-4">
         <select 
           className="w-full px-4 py-2 rounded-lg bg-[#1C1C22] text-[#F5F5F5] border border-[#5F6FFF]/20"

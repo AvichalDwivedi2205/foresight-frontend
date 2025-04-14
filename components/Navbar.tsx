@@ -24,11 +24,14 @@ export default function Navbar() {
             <Link href="/markets" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
               Markets
             </Link>
-            <Link href="/dashboard" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
+            <Link href="/profile" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
               Dashboard
             </Link>
             <Link href="/create" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
               Create
+            </Link>
+            <Link href="/leaderboard" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
+              Leaderboard
             </Link>
             
             {/* Connect wallet button */}
@@ -82,7 +85,7 @@ export default function Navbar() {
               Markets
             </Link>
             <Link 
-              href="/dashboard" 
+              href="/profile" 
               className="block px-3 py-2 rounded-md text-base font-medium text-[#F5F5F5] hover:bg-[#5F6FFF]/10 hover:text-[#5F6FFF]"
               onClick={() => setIsMobileMenuOpen(false)}
             >

@@ -1,95 +1,108 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-const Navbar = () => {
-  const [scrolled, setScrolled] = useState(false);
-  
-  useEffect(() => {
-    const handleScroll = () => {
-      const isScrolled = window.scrollY > 10;
-      if (isScrolled !== scrolled) {
-        setScrolled(isScrolled);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [scrolled]);
+export default function Navbar() {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
-    <motion.header
-      className={`fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300 ${
-        scrolled ? "bg-[#0E0E10]/90 backdrop-blur-md shadow-lg" : "bg-transparent"
-      }`}
-      initial={{ y: -20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ delay: 0.2, duration: 0.5 }}
-    >
-      <nav className="flex justify-between items-center max-w-7xl mx-auto">
-        <Link href="/" className="group">
-          <motion.div 
-            className="flex items-center gap-2"
-            whileHover={{ scale: 1.05 }}
-          >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] flex items-center justify-center">
-              <span className="font-bold text-white">FP</span>
+    <nav className="bg-[#0E0E10] border-b border-white/5">
+      <div className="container mx-auto px-4 max-w-7xl">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center">
+            <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7]">
+              ForesightProtocol
+            </span>
+            <div className="h-2 w-2 rounded-full bg-[#13ADC7] ml-1 animate-pulse"></div>
+          </Link>
+
+          {/* Desktop navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link href="/markets" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
+              Markets
+            </Link>
+            <Link href="/dashboard" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
+              Dashboard
+            </Link>
+            <Link href="/create" className="text-[#F5F5F5] hover:text-[#5F6FFF] transition-colors">
+              Create
+            </Link>
+            
+            {/* Connect wallet button */}
+            <motion.button
+              className="bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-5 py-2 rounded-full"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Connect Wallet
+            </motion.button>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="inline-flex items-center justify-center p-2 rounded-md text-[#F5F5F5] hover:text-white hover:bg-gray-800/50"
+            >
+              <svg
+                className="h-6 w-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                {isMobileMenuOpen ? (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                ) : (
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+                )}
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile menu */}
+      {isMobileMenuOpen && (
+        <motion.div
+          className="md:hidden bg-[#1C1C22]"
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            <Link 
+              href="/markets" 
+              className="block px-3 py-2 rounded-md text-base font-medium text-[#F5F5F5] hover:bg-[#5F6FFF]/10 hover:text-[#5F6FFF]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Markets
+            </Link>
+            <Link 
+              href="/dashboard" 
+              className="block px-3 py-2 rounded-md text-base font-medium text-[#F5F5F5] hover:bg-[#5F6FFF]/10 hover:text-[#5F6FFF]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Dashboard
+            </Link>
+            <Link 
+              href="/create" 
+              className="block px-3 py-2 rounded-md text-base font-medium text-[#F5F5F5] hover:bg-[#5F6FFF]/10 hover:text-[#5F6FFF]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Create
+            </Link>
+            <div className="pt-2">
+              <button className="w-full bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-4 py-2 rounded-full">
+                Connect Wallet
+              </button>
             </div>
-            <span className="font-bold text-xl text-[#F5F5F5]">Foresight Protocol</span>
-          </motion.div>
-        </Link>
-        
-        <div className="hidden md:flex items-center gap-8">
-          <NavLink href="/">Home</NavLink>
-          <NavLink href="/markets" isActive>Markets</NavLink>
-          <NavLink href="#features">Features</NavLink>
-          <NavLink href="#about">About</NavLink>
-        </div>
-        
-        <div className="flex items-center gap-4">
-          <motion.button
-            className="hidden md:block px-4 py-2 rounded-full border border-[#13ADC7] text-[#13ADC7] hover:bg-[#13ADC7]/10 transition-all"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 10px rgba(19, 173, 199, 0.5)" }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Explore Markets
-          </motion.button>
-          
-          <motion.button
-            className="px-4 py-2 rounded-full bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] hover:opacity-90 text-white font-medium transition-all"
-            whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(95, 111, 255, 0.6)" }}
-            whileTap={{ scale: 0.98 }}
-          >
-            Connect Wallet
-          </motion.button>
-          
-          <button className="md:hidden text-white">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M3 12H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M3 6H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <path d="M3 18H21" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-          </button>
-        </div>
-      </nav>
-    </motion.header>
+          </div>
+        </motion.div>
+      )}
+    </nav>
   );
-};
-
-const NavLink = ({ href, children, isActive = false }: { href: string; children: React.ReactNode, isActive?: boolean }) => {
-  return (
-    <Link href={href} className="group">
-      <motion.span
-        className={`${isActive ? "text-white" : "text-white/80 hover:text-white"} relative`}
-        whileHover={{ scale: 1.1 }}
-      >
-        {children}
-        <span className={`absolute left-0 right-0 bottom-0 h-0.5 bg-[#13ADC7] transform ${isActive ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'} transition-transform origin-left duration-300`}></span>
-      </motion.span>
-    </Link>
-  );
-};
-
-export default Navbar;
+}

@@ -21,8 +21,6 @@ export default function StatsPanel({ poolSize, stakerCount, timeLeft, outcomes }
   useEffect(() => {
     if (!timeLeft) return;
     
-    // In a real implementation, this would be a proper countdown logic
-    // For now, we just update it occasionally to show animation
     const interval = setInterval(() => {
       // This is just for effect - in real app we'd actually compute time difference
       if (timeLeft.includes("3d 8h")) {

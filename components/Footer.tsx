@@ -79,6 +79,11 @@ export default function Footer() {
                   Create Market
                 </Link>
               </li>
+              <li>
+                <Link href="/profile" className="text-[#B0B0B0] hover:text-[#5F6FFF] transition-colors">
+                  Dashboard
+                </Link>
+              </li>
             </ul>
           </div>
           

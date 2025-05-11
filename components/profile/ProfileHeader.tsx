@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useWallet } from '../../lib/wallet-provider';
 
 interface ProfileHeaderProps {
   walletAddress: string;
@@ -11,6 +12,7 @@ interface ProfileHeaderProps {
 
 export default function ProfileHeader({ walletAddress, joinDate, rank }: ProfileHeaderProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const { disconnectWallet } = useWallet();
   
   // Format join date
   const formatDate = (dateString: string) => {
@@ -58,6 +60,7 @@ export default function ProfileHeader({ walletAddress, joinDate, rank }: Profile
                 className="ml-2 text-[#B0B0B0] hover:text-[#5F6FFF] transition-colors p-1"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
+                title="Copy wallet address"
               >
                 {isCopied ? (
                   <svg className="w-5 h-5 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,6 +71,18 @@ export default function ProfileHeader({ walletAddress, joinDate, rank }: Profile
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                   </svg>
                 )}
+              </motion.button>
+              
+              <motion.button
+                onClick={disconnectWallet}
+                className="ml-3 text-[#B0B0B0] hover:text-[#FF5555] transition-colors p-1"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                title="Disconnect wallet"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
               </motion.button>
             </div>
             

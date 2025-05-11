@@ -8,28 +8,28 @@ import ProfileHeader from '../../components/profile/ProfileHeader';
 import ProfileStats from '../../components/profile/ProfileStats';
 import MyMarketsSection from '../../components/profile/MyMarketsSection';
 import MyPredictionsSection from '../../components/profile/MyPredictionsSection';
+import { useWallet } from '../../lib/wallet-provider';
 
 export default function ProfilePage() {
-  const [isWalletConnected, setIsWalletConnected] = useState(false);
+  const { connected, publicKey, connecting, WalletButton } = useWallet();
   const [isLoading, setIsLoading] = useState(true);
   const [profileData, setProfileData] = useState<any>(null);
 
-  // Simulate wallet connection and data loading
+  // Fetch profile data if wallet is connected
   useEffect(() => {
-    // Check if wallet is connected (this would be handled by your actual wallet integration)
-    const checkWalletConnection = () => {
-      // Mock wallet connection status for demo
-      setTimeout(() => {
-        setIsWalletConnected(true);
-      }, 1000);
-    };
+    if (!connected || !publicKey) {
+      setIsLoading(false);
+      return;
+    }
 
-    // Fetch profile data if wallet is connected
+    // Fetch profile data
     const fetchProfileData = async () => {
-      // Mock API call
+      setIsLoading(true);
+      
+      // Mock API call - in production, this would fetch from your backend or blockchain
       setTimeout(() => {
         setProfileData({
-          walletAddress: "8zJ4SuewgAwnU7Cc1jZTx3JeKhF4NeKTJqK2EiWU6nM3",
+          walletAddress: publicKey.toString(),
           joinDate: "2023-11-15",
           stats: {
             accuracy: 68,
@@ -95,9 +95,8 @@ export default function ProfilePage() {
       }, 2000);
     };
 
-    checkWalletConnection();
     fetchProfileData();
-  }, []);
+  }, [connected, publicKey]);
 
   return (
     <div className="min-h-screen bg-[#0E0E10] text-[#F5F5F5]">
@@ -109,7 +108,7 @@ export default function ProfilePage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        {!isWalletConnected ? (
+        {!connected ? (
           <div className="flex flex-col items-center justify-center h-[50vh] text-center">
             <motion.div
               className="bg-[#151518] rounded-lg border border-white/10 p-10 max-w-md w-full"
@@ -121,13 +120,9 @@ export default function ProfilePage() {
               <p className="text-[#B0B0B0] mb-6">
                 Connect your wallet to view your dashboard, prediction history, and performance stats.
               </p>
-              <motion.button
-                className="bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-6 py-3 rounded-lg w-full font-medium"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Connect Wallet
-              </motion.button>
+              <div className="flex justify-center">
+                <WalletButton />
+              </div>
             </motion.div>
           </div>
         ) : isLoading ? (
@@ -173,7 +168,7 @@ export default function ProfilePage() {
               </div>
             </div>
           </div>
-        ) : (
+        ) : profileData ? (
           <div className="space-y-8">
             <ProfileHeader 
               walletAddress={profileData.walletAddress}
@@ -186,6 +181,28 @@ export default function ProfilePage() {
             <MyMarketsSection markets={profileData.markets} />
             
             <MyPredictionsSection predictions={profileData.predictions} />
+          </div>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-[40vh] text-center">
+            <motion.div
+              className="bg-[#151518] rounded-lg border border-white/10 p-8 max-w-lg w-full"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ duration: 0.4 }}
+            >
+              <h2 className="text-xl font-bold mb-4">No Profile Data Found</h2>
+              <p className="text-[#B0B0B0] mb-4">
+                We couldn't find any profile data for your wallet. Create your first prediction to get started!
+              </p>
+              <motion.button
+                className="bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-6 py-3 rounded-lg font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => window.location.href = '/markets'}
+              >
+                Explore Markets
+              </motion.button>
+            </motion.div>
           </div>
         )}
       </motion.main>

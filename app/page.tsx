@@ -79,6 +79,7 @@ const Header = () => {
             className="px-4 py-2 rounded-full bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] hover:opacity-90 text-white font-medium transition-all"
             whileHover={{ scale: 1.05, boxShadow: "0 0 15px rgba(95, 111, 255, 0.6)" }}
             whileTap={{ scale: 0.98 }}
+            onClick={() => document.querySelector<HTMLElement>('.wallet-adapter-button')?.click()}
           >
             Connect Wallet
           </motion.button>
@@ -161,6 +162,7 @@ const HeroSection = () => {
                 className="px-6 py-3 rounded-full bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] hover:opacity-90 text-white font-medium text-lg glow-primary"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.98 }}
+                onClick={() => document.querySelector<HTMLElement>('.wallet-adapter-button')?.click()}
               >
                 Connect Wallet
               </motion.button>

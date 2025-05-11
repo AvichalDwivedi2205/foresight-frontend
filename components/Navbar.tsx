@@ -1,14 +1,40 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useWallet } from "../lib/wallet-provider";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { publicKey, connected, connecting, connectWallet, disconnectWallet, balance, WalletButton } = useWallet();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Handle scroll effects
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Format wallet address for display
+  const formatWalletAddress = (address: string) => {
+    if (!address) return "";
+    return address.slice(0, 4) + "..." + address.slice(-4);
+  };
+
+  // Format SOL balance
+  const formatBalance = (sol: number) => {
+    return sol.toFixed(2);
+  };
 
   return (
-    <nav className="bg-[#0E0E10] border-b border-white/5">
+    <nav className={`fixed w-full z-50 bg-[#0E0E10] border-b transition-all duration-300 ${
+      isScrolled ? "border-white/10 bg-[#0E0E10]/90 backdrop-blur-md shadow-lg" : "border-transparent"
+    }`}>
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
@@ -34,14 +60,20 @@ export default function Navbar() {
               Leaderboard
             </Link>
             
-            {/* Connect wallet button */}
-            <motion.button
-              className="bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-5 py-2 rounded-full"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Connect Wallet
-            </motion.button>
+            {/* Wallet button */}
+            <div className="wallet-adapter-button-wrapper">
+              {connected && (
+                <motion.div 
+                  className="mr-4 bg-[#181820] border border-white/10 text-white py-2 px-3 rounded-full inline-flex items-center gap-2"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.2 }}
+                >
+                  <span className="text-[#13ADC7]">{formatBalance(balance)} SOL</span>
+                </motion.div>
+              )}
+              <WalletButton />
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -98,10 +130,22 @@ export default function Navbar() {
             >
               Create
             </Link>
-            <div className="pt-2">
-              <button className="w-full bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-4 py-2 rounded-full">
-                Connect Wallet
-              </button>
+            <Link 
+              href="/leaderboard" 
+              className="block px-3 py-2 rounded-md text-base font-medium text-[#F5F5F5] hover:bg-[#5F6FFF]/10 hover:text-[#5F6FFF]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Leaderboard
+            </Link>
+            <div className="pt-2 flex justify-center">
+              {connected && (
+                <div className="mb-2 bg-[#181820] border border-white/10 text-white py-2 px-3 rounded-full inline-flex items-center gap-2">
+                  <span className="text-[#13ADC7]">{formatBalance(balance)} SOL</span>
+                </div>
+              )}
+              <div className="w-full flex justify-center">
+                <WalletButton />
+              </div>
             </div>
           </div>
         </motion.div>

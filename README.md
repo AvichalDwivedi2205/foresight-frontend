@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Foresight Protocol Frontend
+
+A decentralized prediction market platform built on Solana.
+
+## Features
+
+- Create and participate in prediction markets
+- AI-powered market scoring and analysis
+- NFT achievements for successful predictions
+- Token swaps with Jupiter integration
+- Wallet connection with Walrus and Privy
+- Transaction monitoring with txTx
+- Admin dashboard for platform management
+
+## Third-Party Integrations
+
+This frontend integrates with the following services:
+
+- **Helius/QuickNode**: RPC providers and blockchain indexing
+- **Metaplex**: NFT creation and display
+- **Jupiter**: Token swapping
+- **Walrus**: Wallet connection and transaction UI
+- **Privy**: Authentication and wallet abstraction
+- **txTx**: Transaction monitoring and notifications
+- **Firebase**: Data storage and user profiles
+- **Gemini AI**: Market scoring and analysis
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+ and npm/yarn
+- Solana devnet account with SOL for testing
+
+### Environment Setup
+
+1. Copy the example environment file:
+
+```bash
+cp .env.local.example .env.local
+```
+
+2. Fill in your API keys and configuration values in `.env.local`
+
+### Installation
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### Development
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will start on [http://localhost:3022](http://localhost:3022).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Project Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/`: Next.js 15 app router directory containing pages
+- `components/`: Reusable UI components
+- `lib/`: Service integrations and utilities
+  - `ai-service.tsx`: Gemini AI integration for market analysis
+  - `connection.tsx`: Helius/QuickNode RPC connection provider
+  - `firebase.tsx`: Firebase integration for additional data storage
+  - `indexer.tsx`: On-chain data indexing with Helius
+  - `jupiter.tsx`: Token swap integration
+  - `metaplex.tsx`: NFT integration
+  - `providers.tsx`: Central provider wrapper
+  - `tx-monitoring.tsx`: Transaction monitoring with txTx
+  - `wallet-provider.tsx`: Wallet integration with Walrus
 
-## Learn More
+## Admin Dashboard
 
-To learn more about Next.js, take a look at the following resources:
+The admin dashboard is available at `/admin` and restricted to the wallet address specified in the `NEXT_PUBLIC_ADMIN_WALLET` environment variable.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Smart Contract Integration
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+This frontend integrates with the Foresight Protocol smart contract deployed on Solana devnet. The contract handles:
 
-## Deploy on Vercel
+- Market creation and resolution
+- User predictions
+- Token staking and rewards
+- Creator fees and protocol fees
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Development Notes
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- This application uses server and client components optimized for performance
+- State management is handled with Recoil and React Query for optimized data fetching
+- The UI is built with TailwindCSS and Framer Motion for animations
+- Authentication is managed through Privy for a seamless user experience

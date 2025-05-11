@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Sora:wght@200;300;400;500;600;700&family=Inter:wght@200;300;400;500;600;700&display=swap');
+@import "@solana/wallet-adapter-react-ui/styles.css";
 @import "tailwindcss";
 
 :root {
@@ -42,9 +43,12 @@ body {
 
 /* Animations */
 @keyframes pulse {
-  0% { opacity: 1; }
-  50% { opacity: 0.7; }
-  100% { opacity: 1; }
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 @keyframes float {
@@ -98,3 +102,145 @@ body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+.loader {
+  width: 24px;
+  height: 24px;
+  border: 3px solid #FFF;
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  display: inline-block;
+  box-sizing: border-box;
+  animation: rotation 1s linear infinite;
+}
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.zoom-background {
+  animation: zoomBackground 30s infinite alternate ease-in-out;
+  background-size: 110% 110%;
+  background-position: center;
+}
+
+@keyframes zoomBackground {
+  0% {
+    background-size: 100% 100%;
+  }
+  100% {
+    background-size: 120% 120%;
+  }
+}
+
+.gradient-blur {
+  position: absolute;
+  width: 100%;
+  height: 300px;
+  bottom: 0;
+  background: linear-gradient(to top, #0E0E10 0%, rgba(14, 14, 16, 0) 100%);
+  z-index: 5;
+}
+
+.skeleton-pulse {
+  animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Wallet Adapter Custom Styles */
+.wallet-adapter-button {
+  background: linear-gradient(to right, #5F6FFF, #13ADC7) !important;
+  color: white !important;
+  font-family: inherit !important;
+  font-size: 1rem !important;
+  font-weight: 500 !important;
+  height: auto !important;
+  line-height: initial !important;
+  padding: 0.5rem 1.25rem !important;
+  border-radius: 9999px !important;
+  transition: all 0.2s ease-in-out !important;
+  border: none !important;
+}
+
+.wallet-adapter-button:hover {
+  transform: scale(1.05);
+  opacity: 0.95;
+}
+
+.wallet-adapter-button:active {
+  transform: scale(0.95);
+}
+
+.wallet-adapter-dropdown {
+  font-family: inherit !important;
+}
+
+.wallet-adapter-button-trigger {
+  background: linear-gradient(to right, #5F6FFF, #13ADC7) !important;
+}
+
+.wallet-adapter-modal-wrapper {
+  background-color: #1C1C22 !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  border-radius: 1rem !important;
+}
+
+.wallet-adapter-modal-button-close {
+  background-color: #2A2A30 !important;
+}
+
+.wallet-adapter-modal-title {
+  color: white !important;
+}
+
+.wallet-adapter-modal-content {
+  color: #F5F5F5 !important;
+}
+
+.wallet-adapter-modal-list {
+  margin: 0 0 4px !important;
+}
+
+.wallet-adapter-modal-list li {
+  padding: 0.5rem !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  background: #2A2A30 !important;
+  color: white !important;
+  font-weight: 500 !important;
+  border-radius: 0.5rem !important;
+  transition: background-color 0.2s ease-in-out !important;
+  justify-content: flex-start !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:hover {
+  background-color: #5F6FFF !important;
+  transform: none !important;
+}
+
+.wallet-adapter-modal-list-more {
+  color: #5F6FFF !important;
+  cursor: pointer !important;
+}
+
+.wallet-adapter-modal-list-more:hover {
+  color: #13ADC7 !important;
+}
+
+.wallet-adapter-button-end-icon img,
+.wallet-adapter-button-start-icon img,
+.wallet-adapter-button-end-icon,
+.wallet-adapter-button-start-icon {
+  width: 1.25rem !important;
+  height: 1.25rem !important;
+  margin: 0 0.5rem !important;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

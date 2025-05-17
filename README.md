@@ -129,15 +129,7 @@ cd foresight-protocol/foresight-frontend
 npm install
 # or
 yarn install
-```
 
-### Environment Setup
-Create a `.env.local` file with the following variables:
-```
-NEXT_PUBLIC_RPC_ENDPOINT=https://your-rpc-endpoint.com
-NEXT_PUBLIC_AI_SERVICE_URL=https://your-ai-service.com
-NEXT_PUBLIC_ADMIN_WALLET=your-admin-wallet-address
-```
 
 ### Development
 ```bash

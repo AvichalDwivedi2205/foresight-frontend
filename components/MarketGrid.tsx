@@ -1,130 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
 import MarketCard from "./MarketCard";
 import SkeletonCard from "./SkeletonCard";
+import { Market } from "@/lib/indexer";
 
 interface MarketGridProps {
-  filter: string;
+  markets: Market[];
+  isLoading: boolean;
+  filter?: string; // Keep for backward compatibility
 }
 
-// Mock data for now - would be replaced with API calls in production
-const MOCK_MARKETS = [
-  {
-    id: "market-1",
-    title: "Will ETH reach $5,000 before May 2025?",
-    category: "Crypto",
-    status: "active" as const,
-    poolSize: "342.5K SOL",
-    timeLeft: "3d 8h",
-    outcomes: { yes: 72, no: 28 },
-  },
-  {
-    id: "market-2",
-    title: "Will Apple release AR glasses in 2025?",
-    category: "Tech",
-    status: "active" as const,
-    poolSize: "187.2K SOL",
-    timeLeft: "10d 4h",
-    outcomes: { yes: 45, no: 55 },
-  },
-  {
-    id: "market-3",
-    title: "Will BTC reach $100K in 2025?",
-    category: "Crypto",
-    status: "active" as const,
-    poolSize: "512.8K SOL",
-    timeLeft: "23d 12h",
-    outcomes: { yes: 85, no: 15 },
-    userVoted: true,
-  },
-  {
-    id: "market-4",
-    title: "Will SpaceX reach Mars before 2030?",
-    category: "Space",
-    status: "active" as const,
-    poolSize: "298.4K SOL",
-    timeLeft: "60d 0h",
-    outcomes: { yes: 63, no: 37 },
-  },
-  {
-    id: "market-5",
-    title: "Will Tesla release full autonomous driving globally in 2025?",
-    category: "Tech",
-    status: "resolved" as const,
-    poolSize: "452.7K SOL",
-    outcomes: { yes: 34, no: 66 },
-  },
-  {
-    id: "market-6",
-    title: "Will OpenAI release GPT-5 before the end of 2025?",
-    category: "AI",
-    status: "active" as const,
-    poolSize: "732.1K SOL",
-    timeLeft: "82d 5h",
-    outcomes: { yes: 81, no: 19 },
-  },
-  {
-    id: "market-7",
-    title: "Will the US Federal Reserve cut rates at least twice in 2025?",
-    category: "Economy",
-    status: "resolved" as const,
-    poolSize: "620.3K SOL",
-    outcomes: { yes: 52, no: 48 },
-    userVoted: true,
-  },
-  {
-    id: "market-8",
-    title: "Will Solana reach $500 by Q3 2025?",
-    category: "Crypto",
-    status: "active" as const,
-    poolSize: "892.5K SOL",
-    timeLeft: "45d 12h",
-    outcomes: { yes: 76, no: 24 },
-  },
-];
-
-export default function MarketGrid({ filter }: MarketGridProps) {
-  const [markets, setMarkets] = useState(MOCK_MARKETS);
-  const [loading, setLoading] = useState(true);
-  const [filteredMarkets, setFilteredMarkets] = useState(markets);
-  
-  // Simulate API loading
-  useEffect(() => {
-    setLoading(true);
-    
-    // Simulate network request
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 1500);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
-  // Apply filters when filter changes
-  useEffect(() => {
-    setLoading(true);
-    
-    // Filter logic
-    let filtered = [...markets];
-    if (filter === "active") {
-      filtered = markets.filter(market => market.status === "active");
-    } else if (filter === "resolved") {
-      filtered = markets.filter(market => market.status === "resolved");
-    } else if (filter === "my") {
-      filtered = markets.filter(market => market.userVoted);
-    }
-    
-    // Simulate filter delay
-    const timer = setTimeout(() => {
-      setFilteredMarkets(filtered);
-      setLoading(false);
-    }, 800);
-    
-    return () => clearTimeout(timer);
-  }, [filter, markets]);
-  
+export default function MarketGrid({ markets, isLoading, filter }: MarketGridProps) {
   // Container animation for the grid
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -138,7 +26,7 @@ export default function MarketGrid({ filter }: MarketGridProps) {
   
   return (
     <div className="container mx-auto px-4 max-w-7xl py-8">
-      {loading ? (
+      {isLoading ? (
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           variants={containerVariants}
@@ -150,15 +38,26 @@ export default function MarketGrid({ filter }: MarketGridProps) {
             <SkeletonCard key={index} />
           ))}
         </motion.div>
-      ) : filteredMarkets.length > 0 ? (
+      ) : markets.length > 0 ? (
         <motion.div 
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
         >
-          {filteredMarkets.map((market) => (
-            <MarketCard key={market.id} market={market} />
+          {markets.map((market) => (
+            <MarketCard 
+              key={market.pubkey} 
+              market={{
+                id: market.pubkey,
+                title: market.question,
+                category: market.market_type === 0 ? "Time-bound" : "Open-ended",
+                status: market.resolved ? "resolved" : (market.deadline < Date.now() ? "pending" : "active"),
+                poolSize: `${(market.total_pool / 1e9).toFixed(1)}K SOL`,
+                timeLeft: getTimeLeft(market.deadline),
+                outcomes: formatOutcomesForMarketCard(market),
+              }} 
+            />
           ))}
         </motion.div>
       ) : (
@@ -174,4 +73,48 @@ export default function MarketGrid({ filter }: MarketGridProps) {
       )}
     </div>
   );
+}
+
+// Helper function to format time left
+function getTimeLeft(deadline: number): string {
+  if (deadline <= Date.now()) return "Ended";
+  
+  const diff = deadline - Date.now();
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  
+  return `${days}d ${hours}h`;
+}
+
+// Helper function to format outcomes for the MarketCard component
+function formatOutcomesForMarketCard(market: Market) {
+  // Initialize with default values
+  const yesPercentage = market.stakes_per_outcome[0] / market.total_pool * 100 || 0;
+  const noPercentage = market.stakes_per_outcome[1] / market.total_pool * 100 || 0;
+  
+  return {
+    yes: yesPercentage,
+    no: noPercentage
+  };
+}
+
+// Original helper function (kept for reference if needed elsewhere)
+function getFormattedOutcomes(market: Market) {
+  const outcomes: Record<string, number> = {};
+  
+  if (market.outcomes.length >= 2) {
+    // For binary markets, use yes/no
+    if (market.outcomes.length === 2 && 
+        (market.outcomes[0].toLowerCase() === "yes" || market.outcomes[0].toLowerCase() === "no")) {
+      outcomes.yes = market.stakes_per_outcome[0] / market.total_pool * 100 || 0;
+      outcomes.no = market.stakes_per_outcome[1] / market.total_pool * 100 || 0;
+    } else {
+      // For multi-outcome markets
+      market.outcomes.forEach((outcome, index) => {
+        outcomes[outcome] = market.stakes_per_outcome[index] / market.total_pool * 100 || 0;
+      });
+    }
+  }
+  
+  return outcomes;
 }

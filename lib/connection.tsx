@@ -2,17 +2,14 @@
 
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { Connection } from "@solana/web3.js";
-import { atom, useRecoilState } from "recoil";
+import { getRpcEndpoint } from "./config";
 
-// Define the connection state atom
-export const connectionState = atom({
-  key: "connectionState",
-  default: {
-    endpoint: "",
-    current: "helius" as "helius" | "quicknode",
-    ready: false,
-  },
-});
+// Define the connection state interface
+interface ConnectionState {
+  endpoint: string;
+  current: "helius" | "quicknode" | "default";
+  ready: boolean;
+}
 
 type ConnectionContextType = {
   connection: Connection | null;
@@ -37,7 +34,11 @@ type ConnectionProviderProps = {
 
 export function ConnectionProvider({ children }: ConnectionProviderProps) {
   const [connection, setConnection] = useState<Connection | null>(null);
-  const [connectionData, setConnectionData] = useRecoilState(connectionState);
+  const [connectionData, setConnectionData] = useState<ConnectionState>({
+    endpoint: "",
+    current: "helius",
+    ready: false,
+  });
 
   // Initialize RPC endpoints
   useEffect(() => {

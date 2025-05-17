@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import { useMarketData } from "@/lib/hooks/useMarketData";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 20 },
@@ -735,6 +736,13 @@ const FooterLink = ({ href, children }: { href: string; children: React.ReactNod
 };
 
 export default function Home() {
+  const [activeTab, setActiveTab] = useState<string>("active");
+  const { markets, isLoading } = useMarketData({ filter: activeTab });
+
+  const handleTabChange = (tab: string) => {
+    setActiveTab(tab);
+  };
+
   return (
     <div className="min-h-screen bg-[#0E0E10] text-white overflow-hidden">
       <Header />

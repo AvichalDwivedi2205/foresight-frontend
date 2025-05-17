@@ -1,160 +1,124 @@
 "use client";
 
-import { motion } from 'framer-motion';
-import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from "framer-motion";
 
-interface AIPreviewCardProps {
+type AIPreviewCardProps = {
   isValidating: boolean;
   validationResult: {
     valid: boolean;
     score: number;
     summary: string;
+    potentialIssues?: string[];
   } | null;
-}
+};
 
 export default function AIPreviewCard({ isValidating, validationResult }: AIPreviewCardProps) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  // Format score as percentage
+  const scorePercentage = validationResult ? Math.round(validationResult.score * 100) : 0;
   
-  // Typewriter effect for the summary
-  useEffect(() => {
-    if (validationResult?.summary) {
-      setIsTyping(true);
-      let index = 0;
-      const text = validationResult.summary;
-      
-      const typingInterval = setInterval(() => {
-        if (index < text.length) {
-          setDisplayedText((prev) => prev + text.charAt(index));
-          index++;
-        } else {
-          clearInterval(typingInterval);
-          setIsTyping(false);
-        }
-      }, 20);
-      
-      return () => clearInterval(typingInterval);
-    } else {
-      setDisplayedText("");
-    }
-  }, [validationResult?.summary]);
+  // Determine score color
+  const getScoreColor = (score: number) => {
+    if (score >= 0.9) return "text-green-400";
+    if (score >= 0.8) return "text-emerald-400";
+    if (score >= 0.7) return "text-blue-400";
+    if (score >= 0.6) return "text-yellow-400";
+    return "text-amber-500";
+  };
   
-  // If no validation in progress or result, don't show
-  if (!isValidating && !validationResult) {
-    return null;
-  }
-  
+  // Determine score text
+  const getScoreText = (score: number) => {
+    if (score >= 0.9) return "Excellent";
+    if (score >= 0.8) return "Good";
+    if (score >= 0.7) return "Satisfactory";
+    if (score >= 0.6) return "Needs Improvement";
+    return "Poor";
+  };
+
   return (
-    <motion.div
-      className="mt-8 mb-8 bg-[#151518] rounded-lg border border-white/10 p-6"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-    >
-      <div className="flex items-center mb-4">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          isValidating ? 'bg-amber-500/20' : 
-          validationResult?.valid ? 'bg-green-500/20' : 'bg-red-500/20'
-        }`}>
-          {isValidating ? (
-            <motion.div 
-              className="w-6 h-6 border-t-2 border-amber-500 rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            />
-          ) : validationResult?.valid ? (
-            <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-          ) : (
-            <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          )}
-        </div>
-        
-        <div className="ml-3">
-          <h3 className="text-lg font-medium text-white">
-            {isValidating ? "AI Validation in Progress" : 
-             validationResult?.valid ? "Validated by AI" : "AI Validation Failed"}
-          </h3>
-          
-          {!isValidating && validationResult && (
-            <motion.div
-              className={`mt-1 px-2 py-1 text-xs inline-flex items-center rounded-full ${
-                validationResult.valid ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
-              }`}
-              animate={{ 
-                boxShadow: [
-                  '0 0 0 rgba(0,0,0,0)', 
-                  '0 0 10px rgba(95, 111, 255, 0.7)', 
-                  '0 0 0 rgba(0,0,0,0)'
-                ]
-              }}
-              transition={{ 
-                duration: 2, 
-                repeat: 2,
-                repeatType: 'reverse'
-              }}
-            >
-              {validationResult.valid ? (
-                <>
-                  <span className="mr-1">✓</span>
-                  <span>{Math.round(validationResult.score * 100)}% clear & objective</span>
-                </>
-              ) : (
-                <>
-                  <span className="mr-1">✕</span>
-                  <span>Needs revision</span>
-                </>
-              )}
-            </motion.div>
-          )}
-        </div>
-      </div>
-      
+    <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+      <h3 className="font-semibold text-xl mb-4 flex items-center">
+        <svg className="w-5 h-5 mr-2 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        </svg>
+        AI Validation
+      </h3>
+
       {isValidating ? (
-        <div className="mt-4 bg-[#0E0E10] rounded-md p-4">
-          <div className="flex space-x-2 justify-center items-center h-12">
-            {[...Array(3)].map((_, i) => (
-              <motion.div
-                key={i}
-                className="w-2 h-2 bg-white/50 rounded-full"
-                animate={{ y: [0, -8, 0] }}
-                transition={{ 
-                  duration: 0.6,
-                  repeat: Infinity,
-                  delay: i * 0.2,
-                  ease: "easeInOut" 
-                }}
-              />
-            ))}
-          </div>
-          <p className="text-[#B0B0B0] text-center">Analyzing your market question and outcomes...</p>
+        <div className="py-6 flex flex-col items-center justify-center">
+          <motion.div
+            className="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mb-4"
+            animate={{ rotate: 360 }}
+            transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
+          />
+          <p className="text-white/70">Analyzing market criteria...</p>
         </div>
-      ) : validationResult && (
-        <motion.div 
-          className={`mt-4 bg-[#0E0E10] rounded-md p-4 ${
-            validationResult.valid ? 'border-l-4 border-green-500' : 'border-l-4 border-red-500'
-          }`}
-        >
-          <p className="text-white">
-            {displayedText}
-            {isTyping && <span className="animate-pulse">|</span>}
-          </p>
-          
-          {!validationResult.valid && (
-            <div className="mt-4 text-[#B0B0B0]">
-              <p className="font-medium">Suggestions:</p>
-              <ul className="list-disc list-inside mt-1">
-                <li>Make your question more objective and verifiable</li>
-                <li>Ensure outcomes are mutually exclusive</li>
-                <li>Add specific resolution criteria</li>
-              </ul>
+      ) : !validationResult ? (
+        <div className="p-4 bg-gray-700/30 rounded-lg text-white/70 text-center">
+          <p>Fill in market details and validate to see AI analysis</p>
+        </div>
+      ) : (
+        <AnimatePresence>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <div className="mb-6">
+              <div className="flex justify-between items-center mb-2">
+                <span className="text-white/70">Market Quality Score:</span>
+                <span className={`text-xl font-bold ${getScoreColor(validationResult.score)}`}>
+                  {scorePercentage}%
+                </span>
+              </div>
+              
+              <div className="w-full bg-gray-700 rounded-full h-2.5">
+                <motion.div
+                  className={`h-2.5 rounded-full ${scorePercentage >= 70 ? 'bg-blue-500' : 'bg-amber-500'}`}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${scorePercentage}%` }}
+                  transition={{ duration: 0.8, delay: 0.2 }}
+                />
+              </div>
+              
+              <div className="mt-1 text-right text-sm">
+                <span className={getScoreColor(validationResult.score)}>
+                  {getScoreText(validationResult.score)}
+                </span>
+              </div>
             </div>
-          )}
-        </motion.div>
+            
+            <div className="mb-5">
+              <h4 className="font-medium mb-2">AI Feedback:</h4>
+              <p className="text-white/80 text-sm">
+                {validationResult.summary}
+              </p>
+            </div>
+            
+            {validationResult.potentialIssues && validationResult.potentialIssues.length > 0 && (
+              <div className="mb-5">
+                <h4 className="font-medium mb-2">Potential Issues:</h4>
+                <ul className="list-disc pl-5 text-sm text-amber-300/90 space-y-1">
+                  {validationResult.potentialIssues.map((issue, index) => (
+                    <li key={index}>{issue}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            
+            <div className="flex items-center justify-between p-3 bg-gray-700/30 rounded-lg">
+              <div className="flex items-center">
+                <span className={`w-3 h-3 rounded-full ${validationResult.valid ? 'bg-green-500' : 'bg-red-500'} mr-2`} />
+                <span className="text-sm">
+                  {validationResult.valid ? 'Ready to submit' : 'Needs improvement'}
+                </span>
+              </div>
+              <span className="text-xs text-white/50">
+                Powered by AI
+              </span>
+            </div>
+          </motion.div>
+        </AnimatePresence>
       )}
-    </motion.div>
+    </div>
   );
 }

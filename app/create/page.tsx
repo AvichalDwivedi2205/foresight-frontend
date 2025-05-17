@@ -2,6 +2,11 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useWallet } from '@/lib/wallet-provider';
+import { useAIService } from '@/lib/ai-service';
+import { useToast } from '@/lib/hooks/useToast';
+import { useConnection } from '@/lib/connection';
+import { useIndexer } from '@/lib/indexer';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import CreateMarketForm from '@/components/create/CreateMarketForm';
@@ -9,6 +14,12 @@ import AIPreviewCard from '@/components/create/AIPreviewCard';
 import SubmissionStatus from '@/components/create/SubmissionStatus';
 
 export default function CreateMarketPage() {
+  const { publicKey, connected, sendTransaction } = useWallet();
+  const { connection } = useConnection();
+  const { invalidateMarkets } = useIndexer();
+  const { showToast } = useToast();
+  const { useValidateMarket } = useAIService();
+  
   // Main form data state
   const [formData, setFormData] = useState({
     marketQuestion: '',
@@ -17,14 +28,6 @@ export default function CreateMarketPage() {
     outcomes: ['Yes', 'No'],
     initialStake: ''
   });
-  
-  // AI validation state
-  const [validation, setValidation] = useState<{
-    score: number;
-    summary: string;
-    valid: boolean;
-    isLoading: boolean;
-  } | null>(null);
   
   // Submission state
   const [submission, setSubmission] = useState<{
@@ -35,53 +38,76 @@ export default function CreateMarketPage() {
     status: 'idle',
     message: ''
   });
+
+  // Use the React Query hook for validation
+  const {
+    data: validation,
+    isLoading: isValidating,
+    refetch: validateMarket,
+    isSuccess: isValidated
+  } = useValidateMarket({
+    marketQuestion: formData.marketQuestion,
+    description: formData.description,
+    endDate: formData.endDate,
+    outcomes: formData.outcomes
+  });
   
   // Handle form data updates
   const handleFormChange = (newData: any) => {
     setFormData({ ...formData, ...newData });
-    // Reset validation when form changes
-    if (validation) {
-      setValidation(null);
-    }
   };
   
   // Handle form submission for AI validation
   const handleValidateSubmit = async () => {
-    setValidation({ score: 0, summary: '', valid: false, isLoading: true });
-    
-    // Simulate API call to validate with AI
-    setTimeout(() => {
-      // Mock AI validation response
-      const mockValidation = {
-        score: Math.random() * 0.5 + 0.5, // Random score between 0.5-1
-        summary: "This prediction market about " + formData.marketQuestion.substring(0, 30) + 
-                "... is well-defined, measurable, and has a clear resolution criteria. The timeframe is appropriate and outcomes are mutually exclusive.",
-        valid: true,
-        isLoading: false
-      };
-      setValidation(mockValidation);
-    }, 2000);
+    validateMarket();
   };
   
   // Handle final submission to create market
   const handleCreateMarket = async () => {
-    if (!validation?.valid) return;
+    if (!validation?.valid) {
+      showToast("Market validation failed. Please review and try again.", "error");
+      return;
+    }
+    
+    if (!connected || !publicKey) {
+      showToast("Please connect your wallet first", "warning");
+      return;
+    }
     
     setSubmission({
       status: 'loading',
       message: 'Creating your prediction market on Solana...'
     });
     
-    // Simulate blockchain transaction
-    setTimeout(() => {
+    try {
+      // Mock transaction for now
+      // In production, this would create and send the actual Solana transaction
+      // using the Anchor program and smart contract
+      
+      // Simulate blockchain delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
       // Mock successful transaction
       const mockMarketId = 'market-' + Math.floor(Math.random() * 1000);
+      
+      // Success!
       setSubmission({
         status: 'success',
-        message: 'Your prediction market is now live on Solana Devnet!',
+        message: 'Your prediction market is now live on Solana!',
         marketId: mockMarketId
       });
-    }, 3000);
+      
+      // Invalidate cache to refresh markets list
+      invalidateMarkets();
+      
+    } catch (error) {
+      console.error("Failed to create market:", error);
+      
+      setSubmission({
+        status: 'error',
+        message: 'Failed to create market. Please try again later.'
+      });
+    }
   };
   
   // Handle form reset
@@ -93,9 +119,19 @@ export default function CreateMarketPage() {
       outcomes: ['Yes', 'No'],
       initialStake: ''
     });
-    setValidation(null);
-    setSubmission({ status: 'idle', message: '' });
+    
+    setSubmission({ 
+      status: 'idle', 
+      message: '' 
+    });
   };
+
+  // Redirect to wallet connection if not connected
+  useEffect(() => {
+    if (!connected && validation?.valid) {
+      showToast("Please connect your wallet to create a market", "info");
+    }
+  }, [connected, validation?.valid, showToast]);
 
   return (
     <div className="min-h-screen bg-[#0E0E10] text-[#F5F5F5]">
@@ -127,17 +163,17 @@ export default function CreateMarketPage() {
               formData={formData}
               onChange={handleFormChange}
               onValidateSubmit={handleValidateSubmit}
-              isValidating={validation?.isLoading || false}
-              isValidated={validation?.valid || false}
+              isValidating={isValidating}
+              isValidated={isValidated && !!validation?.valid}
             />
           </div>
           
           {/* Right sidebar - takes 1/3 of the grid on large screens */}
           <div className="space-y-6">
             <AIPreviewCard 
-              isValidating={validation?.isLoading || false}
+              isValidating={isValidating}
               validationResult={validation ? 
-                {valid: validation.valid, score: validation.score, summary: validation.summary} : null
+                {valid: validation.valid, score: validation.score, summary: validation.summary, potentialIssues: validation.potentialIssues} : null
               }
             />
             

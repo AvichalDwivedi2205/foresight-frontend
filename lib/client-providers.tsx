@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
-import { WalletProvider } from "./wallet-provider";
-import { WalletAdapterProvider } from "./wallet-adapter";
+import { WalletProviderRoot } from "./wallet-provider";
+import { ConnectionProvider } from "./connection";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { Toaster } from "react-hot-toast";
@@ -26,8 +26,8 @@ type ClientProvidersProps = {
 export function ClientProviders({ children }: ClientProvidersProps) {
   return (
     <QueryClientProvider client={queryClient}>
-      <WalletAdapterProvider>
-        <WalletProvider>
+      <ConnectionProvider>
+        <WalletProviderRoot>
           {children}
           <Toaster 
             position="bottom-right" 
@@ -39,8 +39,8 @@ export function ClientProviders({ children }: ClientProvidersProps) {
               },
             }}
           />
-        </WalletProvider>
-      </WalletAdapterProvider>
+        </WalletProviderRoot>
+      </ConnectionProvider>
       {process.env.NODE_ENV !== "production" && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );

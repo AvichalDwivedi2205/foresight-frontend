@@ -1,25 +1,49 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-interface FilterTabsProps {
-  onFilterChange: (filter: string) => void;
+interface TabItem {
+  id: string;
+  label: string;
 }
 
-export default function FilterTabs({ onFilterChange }: FilterTabsProps) {
-  const [activeFilter, setActiveFilter] = useState("all");
+interface FilterTabsProps {
+  onFilterChange?: (filter: string) => void;
+  activeTab?: string;
+  onTabChange?: (tab: string) => void;
+  tabs?: TabItem[];
+}
+
+export default function FilterTabs({ 
+  onFilterChange, 
+  activeTab: externalActiveTab, 
+  onTabChange,
+  tabs
+}: FilterTabsProps) {
+  const [activeFilter, setActiveFilter] = useState(externalActiveTab || "all");
   
-  const filterOptions = [
+  // Use either provided tabs or default tabs
+  const filterOptions = tabs || [
     { id: "all", label: "All Markets" },
     { id: "active", label: "Active" },
     { id: "resolved", label: "Resolved" },
     { id: "my", label: "My Markets" },
   ];
   
+  // Update internal state when external activeTab changes
+  useEffect(() => {
+    if (externalActiveTab) {
+      setActiveFilter(externalActiveTab);
+    }
+  }, [externalActiveTab]);
+  
   const handleTabClick = (filterId: string) => {
     setActiveFilter(filterId);
-    onFilterChange(filterId);
+    
+    // Support both old and new APIs
+    if (onFilterChange) onFilterChange(filterId);
+    if (onTabChange) onTabChange(filterId);
   };
   
   return (

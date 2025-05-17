@@ -1,121 +1,106 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-interface OutcomeOptionsProps {
-  outcomes: {
-    yes: number;
-    no: number;
+type OutcomeOptionsProps = {
+  outcomes: Record<string, number>;
+  selectedOutcome: number | null;
+  onOutcomeChange: (outcomeIndex: number) => void;
+  outcomeLabels?: string[];
+  userPrediction?: {
+    outcome: number;
+    amount: number;
   };
-  selectedOutcome: string | null;
-  onOutcomeChange: (outcome: string) => void;
-}
+  disabled?: boolean;
+};
 
 export default function OutcomeOptions({
   outcomes,
   selectedOutcome,
   onOutcomeChange,
+  outcomeLabels,
+  userPrediction,
+  disabled = false
 }: OutcomeOptionsProps) {
+  // Create an array of outcome keys and values for easier rendering
+  const outcomeEntries = Object.entries(outcomes);
+  
+  // Map the entries to include the original index if outcomeLabels is provided
+  const mappedOutcomes = outcomeLabels
+    ? outcomeLabels.map((label, index) => ({
+        label,
+        value: outcomes[label] || 0,
+        index
+      }))
+    : outcomeEntries.map(([key, value], index) => ({
+        label: key,
+        value,
+        index
+      }));
+  
   return (
-    <motion.div
-      className="bg-[#1C1C22] p-6 rounded-xl border border-white/5"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4 }}
-    >
-      <h3 className="text-xl font-bold mb-4">Choose Your Prediction</h3>
+    <div className="p-6 rounded-lg bg-gray-800/50 border border-gray-700">
+      <h3 className="text-xl font-semibold mb-3">Predict Outcome</h3>
+      <p className="text-white/70 mb-4">
+        Select an outcome and stake your prediction.
+      </p>
       
-      <div className="grid grid-cols-2 gap-4">
-        <motion.button
-          className={`relative p-5 rounded-xl border ${
-            selectedOutcome === "Yes"
-              ? "border-green-500 bg-green-500/10"
-              : "border-white/10 hover:border-white/20 bg-[#0E0E10]"
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onOutcomeChange("Yes")}
-        >
-          <div className="text-lg font-bold mb-1 text-green-400">Yes</div>
-          <div className="text-sm text-[#B0B0B0]">{outcomes.yes}%</div>
-          
-          {selectedOutcome === "Yes" && (
-            <motion.div 
-              className="absolute -top-1 -right-1 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 15 }}
-            >
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </motion.div>
-          )}
-          
-          {/* Pulse effect when selected */}
-          {selectedOutcome === "Yes" && (
-            <motion.div
-              className="absolute inset-0 rounded-xl border border-green-500"
-              animate={{ 
-                opacity: [1, 0],
-                scale: [1, 1.05] 
-              }}
-              transition={{ 
-                duration: 1,
-                repeat: Infinity,
-                repeatType: "loop"
-              }}
-            ></motion.div>
-          )}
-        </motion.button>
-        
-        <motion.button
-          className={`relative p-5 rounded-xl border ${
-            selectedOutcome === "No"
-              ? "border-red-500 bg-red-500/10"
-              : "border-white/10 hover:border-white/20 bg-[#0E0E10]"
-          }`}
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={() => onOutcomeChange("No")}
-        >
-          <div className="text-lg font-bold mb-1 text-red-400">No</div>
-          <div className="text-sm text-[#B0B0B0]">{outcomes.no}%</div>
-          
-          {selectedOutcome === "No" && (
-            <motion.div 
-              className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center"
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 500, damping: 15 }}
-            >
-              <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </motion.div>
-          )}
-          
-          {/* Pulse effect when selected */}
-          {selectedOutcome === "No" && (
-            <motion.div
-              className="absolute inset-0 rounded-xl border border-red-500"
-              animate={{ 
-                opacity: [1, 0],
-                scale: [1, 1.05] 
-              }}
-              transition={{ 
-                duration: 1,
-                repeat: Infinity,
-                repeatType: "loop"
-              }}
-            ></motion.div>
-          )}
-        </motion.button>
+      {userPrediction && (
+        <div className="mb-4 p-3 bg-blue-900/30 rounded-md border border-blue-700/50">
+          <p className="text-blue-300 font-medium">
+            Your prediction: <span className="text-white">{mappedOutcomes[userPrediction.outcome]?.label || '?'}</span>
+          </p>
+          <p className="text-sm text-blue-300/80">
+            Amount staked: <span className="text-white">{userPrediction.amount.toFixed(2)} SOL</span>
+          </p>
+        </div>
+      )}
+      
+      <div className="space-y-3">
+        {mappedOutcomes.map(({ label, value, index }) => (
+          <button
+            key={index}
+            onClick={() => !disabled && onOutcomeChange(index)}
+            disabled={disabled}
+            className={`w-full p-4 rounded-lg flex flex-col transition-colors duration-200 ${
+              selectedOutcome === index
+                ? "bg-blue-700 border border-blue-500"
+                : "bg-gray-700/50 border border-gray-600 hover:bg-gray-700"
+            } ${disabled ? "opacity-70 cursor-not-allowed" : "cursor-pointer"}`}
+          >
+            <div className="flex justify-between items-center">
+              <span className="font-medium">{label}</span>
+              <span className="text-sm bg-black/30 px-2 py-1 rounded">
+                {value}%
+              </span>
+            </div>
+            
+            <div className="mt-2 w-full bg-gray-800 rounded-full h-1.5 overflow-hidden">
+              <motion.div
+                className={`h-full ${
+                  selectedOutcome === index ? "bg-blue-500" : "bg-blue-700/70"
+                }`}
+                initial={{ width: 0 }}
+                animate={{ width: `${value}%` }}
+                transition={{ duration: 1, delay: 0.2 }}
+              />
+            </div>
+            
+            {userPrediction?.outcome === index && (
+              <div className="mt-2">
+                <span className="text-xs text-blue-300">Your prediction</span>
+              </div>
+            )}
+          </button>
+        ))}
       </div>
       
-      <div className="mt-4 text-xs text-[#B0B0B0] text-center">
-        Select an outcome to stake your tokens
-      </div>
-    </motion.div>
+      {disabled && (
+        <p className="mt-4 text-sm text-amber-400">
+          Market is no longer active for predictions
+        </p>
+      )}
+    </div>
   );
 }

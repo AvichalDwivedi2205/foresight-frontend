@@ -10,6 +10,9 @@ export default function MarketDetailPage({ params }: { params: { id: string } })
   return (
     <div className="min-h-screen bg-[#0E0E10] text-[#F5F5F5]">
       <Navbar />
+      <div className="flex flex-col items-center justify-center p-4">
+        
+      </div>
       <Suspense fallback={<MarketSkeleton />}>
         <MarketDetailClient marketId={params.id} />
       </Suspense>

@@ -9,11 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@jup-ag/api": "^6.0.41",
+    "@jup-ag/react-hook": "^6.2.0",
+    "@solana/spl-token": "^0.4.13",
+    "@solana/wallet-adapter-base": "^0.9.26",
+    "@solana/wallet-adapter-react": "^0.15.38",
+    "@solana/wallet-adapter-react-ui": "^0.9.38",
+    "@solana/wallet-adapter-wallets": "^0.19.36",
+    "@solana/web3.js": "^1.98.2",
+    "@tanstack/react-query": "^5.76.1",
+    "@types/bn.js": "^5.1.6",
+    "bn.js": "^5.2.2",
     "framer-motion": "^12.6.5",
     "next": "15.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-intersection-observer": "^9.16.0"
+    "react-hot-toast": "^2.5.2",
+    "react-intersection-observer": "^9.16.0",
+    "zustand": "^5.0.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

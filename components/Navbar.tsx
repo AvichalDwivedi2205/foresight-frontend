@@ -3,9 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import WalletButton from "./WalletButton";
+import SwapTokensModal from "./SwapTokensModal";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
 
   return (
     <nav className="bg-[#0E0E10] border-b border-white/5">
@@ -34,14 +37,18 @@ export default function Navbar() {
               Leaderboard
             </Link>
             
-            {/* Connect wallet button */}
+            {/* Swap Tokens Button */}
             <motion.button
-              className="bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-5 py-2 rounded-full"
+              className="bg-gradient-to-r from-[#FF9500] to-[#FFD500] text-[#121212] px-5 py-2 rounded-full font-medium"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => setIsSwapModalOpen(true)}
             >
-              Connect Wallet
+              Swap Tokens
             </motion.button>
+            
+            {/* Wallet button */}
+            <WalletButton />
           </div>
 
           {/* Mobile menu button */}
@@ -98,14 +105,38 @@ export default function Navbar() {
             >
               Create
             </Link>
+            <Link 
+              href="/leaderboard" 
+              className="block px-3 py-2 rounded-md text-base font-medium text-[#F5F5F5] hover:bg-[#5F6FFF]/10 hover:text-[#5F6FFF]"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Leaderboard
+            </Link>
+            <button
+              className="w-full px-3 py-2 mt-2 rounded-md text-base font-medium text-[#121212] bg-gradient-to-r from-[#FF9500] to-[#FFD500]"
+              onClick={() => {
+                setIsSwapModalOpen(true);
+                setIsMobileMenuOpen(false);
+              }}
+            >
+              Swap Tokens
+            </button>
             <div className="pt-2">
-              <button className="w-full bg-gradient-to-r from-[#5F6FFF] to-[#13ADC7] text-white px-4 py-2 rounded-full">
-                Connect Wallet
-              </button>
+              <WalletButton />
             </div>
           </div>
         </motion.div>
       )}
+
+      {/* Swap Tokens Modal */}
+      <SwapTokensModal 
+        isOpen={isSwapModalOpen} 
+        onClose={() => setIsSwapModalOpen(false)} 
+        onSwapComplete={(signature) => {
+          console.log("Swap completed with signature:", signature);
+          setIsSwapModalOpen(false);
+        }}
+      />
     </nav>
   );
 }

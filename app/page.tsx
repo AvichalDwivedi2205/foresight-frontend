@@ -181,7 +181,7 @@ const HeroSection = () => {
               className="text-white/60 text-sm mt-4"
               variants={fadeIn}
             >
-              Over $2M in prediction market volume • 10,000+ active users
+              Solana Colessium Breakout Hackathon
             </motion.p>
           </motion.div>
           

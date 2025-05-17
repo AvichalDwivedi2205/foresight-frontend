@@ -1,96 +1,160 @@
 # Foresight Protocol Frontend
 
-A decentralized prediction market platform built on Solana.
+A decentralized prediction market platform built on Solana blockchain that leverages AI for market creation, validation, and resolution.
 
-## Features
+## Overview
 
-- Create and participate in prediction markets
-- AI-powered market scoring and analysis
-- NFT achievements for successful predictions
-- Token swaps with Jupiter integration
-- Wallet connection with Walrus and Privy
-- Transaction monitoring with txTx
-- Admin dashboard for platform management
+Foresight Protocol is a next-generation prediction market platform that allows users to:
+- Create markets on future events
+- Stake tokens on potential outcomes
+- Earn rewards for accurate predictions
+- Leverage AI for market validation and resolution
 
-## Third-Party Integrations
+The frontend provides an intuitive, modern interface for interacting with the Foresight Protocol smart contracts on the Solana blockchain.
 
-This frontend integrates with the following services:
+## Technologies & Services
 
-- **Helius/QuickNode**: RPC providers and blockchain indexing
-- **Metaplex**: NFT creation and display
-- **Jupiter**: Token swapping
-- **Walrus**: Wallet connection and transaction UI
-- **Privy**: Authentication and wallet abstraction
-- **txTx**: Transaction monitoring and notifications
-- **Firebase**: Data storage and user profiles
-- **Gemini AI**: Market scoring and analysis
+### Core Technologies
+- **Next.js 15**: App router-based framework for both server and client components
+- **React 18**: For building the user interface with modern patterns
+- **TypeScript**: For type-safe code
+- **TailwindCSS**: For responsive styling
+- **Framer Motion**: For fluid animations and transitions
+
+### Blockchain Integration
+- **Solana Web3.js**: Core library for Solana blockchain interaction
+- **Anchor**: Framework for Solana program development
+- **Wallet Adapter**: For seamless wallet connection:
+  - Phantom
+  - Solflare
+  - Walrus
+  - and other Web3 wallets
+
+### Data Management & State
+- **TanStack Query (React Query)**: For efficient data fetching and caching
+- **Zustand/Context API**: For global state management
+
+### Third-Party Services
+- **Jupiter Protocol**: Integrated for token swapping functionality
+- **AI Service Integration**: For market validation, scoring, and resolution
+- **Metaplex**: For NFT creation and display
+- **Helius/QuickNode**: As RPC providers for blockchain data
+- **Firebase**: For additional off-chain data storage
+
+## Architecture
+
+The frontend is structured with a clear separation of concerns:
+
+### `/app` Directory
+Contains Next.js 15 app router pages and layouts
+
+### `/components` Directory
+Reusable UI components organized by feature:
+- `market/`: Components for market display and interaction
+- `wallet/`: Wallet connection and management components
+- `ui/`: Shared UI elements (buttons, cards, inputs)
+
+### `/lib` Directory
+Core services and utilities:
+- `wallet-provider.tsx`: Wallet connection services
+- `connection.tsx`: Solana RPC connection management
+- `indexer.tsx`: On-chain data indexing and retrieval
+- `jupiter.tsx`: Jupiter DEX integration for token swaps
+- `ai-service.tsx`: AI integration for market validation and resolution
+
+### `/hooks` Directory
+Custom React hooks for data and functionality:
+- `useMarketData.tsx`: For fetching and managing market data
+- `useUserPredictions.tsx`: For user prediction history
+- `useToast.tsx`: For notifications
+
+## Key Features
+
+### Market Creation
+Users can create prediction markets with:
+- Custom questions and outcomes
+- AI validation for question quality
+- Time-bound or open-ended resolution options
+
+### Market Participation
+- Stake tokens on outcomes
+- View probability distributions
+- Track market history and trends
+- Receive rewards for correct predictions
+
+### AI Integration
+- AI evaluates market questions for clarity and measurability
+- Provides market scoring and recommendation for deadline
+- Can resolve time-bound markets with high confidence
+- Generates market summaries and analysis
+
+### Wallet Integration
+- Connect multiple wallet types
+- View balances and transaction history
+- Sign transactions for staking and claiming
+
+### Token Swapping
+Jupiter integration allows:
+- Swapping tokens before staking on markets
+- Finding optimal routes for trades
+- Low slippage token exchanges
+
+## Smart Contract Integration
+
+The frontend interacts with the Foresight Protocol smart contract which has these core functions:
+- `create_market`: Creates a new prediction market
+- `stake_prediction`: Stakes tokens on a specific outcome
+- `resolve_market`: Resolves market outcomes (admin or AI)
+- `claim_reward`: Claims rewards for winning predictions
+- `vote_market_outcome`: For community-driven resolution
+
+Data is retrieved through an indexer that watches on-chain events:
+- `MarketCreatedEvent`: Triggered when a new market is created
+- `PredictionStakedEvent`: When a user stakes on an outcome
+- `RewardClaimedEvent`: When a user claims rewards
 
 ## Getting Started
 
 ### Prerequisites
-
 - Node.js 18+ and npm/yarn
-- Solana devnet account with SOL for testing
-
-### Environment Setup
-
-1. Copy the example environment file:
-
-```bash
-cp .env.local.example .env.local
-```
-
-2. Fill in your API keys and configuration values in `.env.local`
+- Solana wallet with SOL for testing
 
 ### Installation
-
 ```bash
+# Clone the repository
+git clone https://github.com/your-org/foresight-protocol
+cd foresight-protocol/foresight-frontend
+
+# Install dependencies
 npm install
 # or
 yarn install
 ```
 
-### Development
+### Environment Setup
+Create a `.env.local` file with the following variables:
+```
+NEXT_PUBLIC_RPC_ENDPOINT=https://your-rpc-endpoint.com
+NEXT_PUBLIC_AI_SERVICE_URL=https://your-ai-service.com
+NEXT_PUBLIC_ADMIN_WALLET=your-admin-wallet-address
+```
 
+### Development
 ```bash
 npm run dev
 # or
 yarn dev
 ```
 
-The application will start on [http://localhost:3022](http://localhost:3022).
+The application will be available at http://localhost:3000.
 
-## Project Structure
+## Deployment
 
-- `app/`: Next.js 15 app router directory containing pages
-- `components/`: Reusable UI components
-- `lib/`: Service integrations and utilities
-  - `ai-service.tsx`: Gemini AI integration for market analysis
-  - `connection.tsx`: Helius/QuickNode RPC connection provider
-  - `firebase.tsx`: Firebase integration for additional data storage
-  - `indexer.tsx`: On-chain data indexing with Helius
-  - `jupiter.tsx`: Token swap integration
-  - `metaplex.tsx`: NFT integration
-  - `providers.tsx`: Central provider wrapper
-  - `tx-monitoring.tsx`: Transaction monitoring with txTx
-  - `wallet-provider.tsx`: Wallet integration with Walrus
+The application can be deployed to Vercel with:
+```bash
+vercel
+```
 
-## Admin Dashboard
+## License
 
-The admin dashboard is available at `/admin` and restricted to the wallet address specified in the `NEXT_PUBLIC_ADMIN_WALLET` environment variable.
-
-## Smart Contract Integration
-
-This frontend integrates with the Foresight Protocol smart contract deployed on Solana devnet. The contract handles:
-
-- Market creation and resolution
-- User predictions
-- Token staking and rewards
-- Creator fees and protocol fees
-
-## Development Notes
-
-- This application uses server and client components optimized for performance
-- State management is handled with Recoil and React Query for optimized data fetching
-- The UI is built with TailwindCSS and Framer Motion for animations
-- Authentication is managed through Privy for a seamless user experience
+[MIT](LICENSE)

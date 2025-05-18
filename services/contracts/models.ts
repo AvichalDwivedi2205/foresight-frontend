@@ -1,5 +1,5 @@
 import { PublicKey } from "@solana/web3.js";
-import { BN } from "bn.js";
+import  BN  from "bn.js";
 
 export enum MarketOutcome {
   Unresolved = 0,

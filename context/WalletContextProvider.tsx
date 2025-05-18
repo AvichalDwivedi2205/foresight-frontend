@@ -28,19 +28,21 @@ export const WalletContextProvider: FC<WalletContextProviderProps> = ({ children
   // Get the RPC endpoint for the selected network
   const endpoint = useMemo(() => clusterApiUrl(network), [network]);
   
-  // Initialize wallet adapters for supported wallets
+  // Initialize wallet adapters for supported wallets with explicit devnet configuration
   const wallets = useMemo(
     () => [
-      new PhantomWalletAdapter(),
-      new SolflareWalletAdapter(),
+      new PhantomWalletAdapter({ network }),
+      new SolflareWalletAdapter({ network }),
       new TorusWalletAdapter(),
     ],
     [network]
   );
 
+  console.log("Initializing wallet context with network:", network);
+  
   return (
     <ConnectionProvider endpoint={endpoint}>
-      <WalletProvider wallets={wallets} autoConnect>
+      <WalletProvider wallets={wallets} autoConnect={false}>
         <WalletModalProvider>{children}</WalletModalProvider>
       </WalletProvider>
     </ConnectionProvider>

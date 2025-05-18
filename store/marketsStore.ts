@@ -97,7 +97,7 @@ export const useMarketsStore = create<MarketsState>()((set) => ({
     selectedCategory: category,
     filters: {
       ...defaultFilters,
-      category,
+      category: category || undefined,
     },
     currentPage: 1
   }),

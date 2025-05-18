@@ -6,7 +6,13 @@ import { useJupiterSwap } from "@/hooks/useJupiterSwap";
 import { TokenInfo } from "@/services/contracts/models";
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
+import { PublicKey } from "@solana/web3.js";
 import toast from "react-hot-toast";
+
+// Add debug logging function
+function logDebug(message: string, data?: any) {
+  console.log(`[SwapTokensModal] ${message}`, data || '');
+}
 
 interface SwapTokensModalProps {
   isOpen: boolean;
@@ -38,19 +44,26 @@ export const SwapTokensModal: React.FC<SwapTokensModalProps> = ({
     if (isOpen) {
       const loadTokens = async () => {
         try {
+          console.log("Loading tokens...");
           const tokens = await getSupportedTokens();
+          console.log(`Loaded ${tokens.length} tokens:`, tokens.slice(0, 3)); // Log first 3 tokens
           setSupportedTokens(tokens);
           
           // Set default tokens (SOL and target token if provided)
           const sol = tokens.find((t) => t.symbol === "SOL");
           if (sol) {
+            console.log("Setting default From token (SOL):", sol);
             setFromToken(sol);
           }
           
           if (targetTokenMint) {
+            console.log("Looking for target token with mint:", targetTokenMint);
             const targetToken = tokens.find((t) => t.address.toString() === targetTokenMint);
             if (targetToken) {
+              console.log("Setting target To token:", targetToken);
               setToToken(targetToken);
+            } else {
+              console.log("Target token not found in supported tokens");
             }
           }
         } catch (error) {
@@ -291,7 +304,10 @@ export const SwapTokensModal: React.FC<SwapTokensModalProps> = ({
                 <div className="bg-[#13141F] rounded-lg p-3 flex items-center">
                   <button
                     className="flex items-center gap-2 bg-[#2D2F3D] rounded-lg px-3 py-2"
-                    onClick={() => setShowTokenSelector("to")}
+                    onClick={() => {
+                      console.log("Opening To token selector");
+                      setShowTokenSelector("to");
+                    }}
                   >
                     {toToken ? (
                       <>
@@ -501,10 +517,20 @@ export const SwapTokensModal: React.FC<SwapTokensModalProps> = ({
                           key={token.address.toString()}
                           className="w-full flex items-center gap-3 p-3 hover:bg-[#2D2F3D] rounded-lg transition-colors"
                           onClick={() => {
+                            console.log(`Token selected: ${token.symbol}, selector: ${showTokenSelector}`);
+                            const tokenCopy = {
+                              address: new PublicKey(token.address.toString()),
+                              symbol: token.symbol,
+                              name: token.name,
+                              decimals: token.decimals,
+                              logoURI: token.logoURI
+                            };
                             if (showTokenSelector === "from") {
-                              setFromToken(token);
+                              console.log("Setting From token:", tokenCopy);
+                              setFromToken(tokenCopy);
                             } else {
-                              setToToken(token);
+                              console.log("Setting To token:", tokenCopy);
+                              setToToken(tokenCopy);
                             }
                             setShowTokenSelector(null);
                             setSearchQuery("");
@@ -545,4 +571,4 @@ export const SwapTokensModal: React.FC<SwapTokensModalProps> = ({
   );
 };
 
-export default SwapTokensModal; 
+export default SwapTokensModal;

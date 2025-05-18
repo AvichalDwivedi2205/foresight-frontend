@@ -3,6 +3,7 @@
 import { 
   Connection, 
   Transaction, 
+  VersionedTransaction,
   PublicKey, 
   SendOptions,
   RpcResponseAndContext,
@@ -29,25 +30,45 @@ export class TransactionService {
 
   // Sign and send a transaction with the provided function from the wallet adapter
   async signAndSendTransaction(
-    transaction: Transaction,
+    transaction: Transaction | VersionedTransaction,
     signTransaction: (transaction: Transaction) => Promise<Transaction>,
     publicKey: PublicKey,
     additionalSigners: Keypair[] = [],
     options?: SendOptions
   ): Promise<string> {
     try {
-      transaction.feePayer = publicKey;
-      transaction.recentBlockhash = (
-        await this.connection.getLatestBlockhash()
-      ).blockhash;
-
-      // If there are additional signers, get them to sign first
-      if (additionalSigners.length > 0) {
-        transaction.partialSign(...additionalSigners);
+      // For versioned transactions, we need to simulate first to catch potential ALT issues
+      if (transaction instanceof VersionedTransaction) {
+        try {
+          // Simulate the transaction to check for ALT issues
+          const simulation = await this.connection.simulateTransaction(transaction);
+          if (simulation.value.err) {
+            console.error("Transaction simulation failed:", simulation.value.err);
+            throw new Error(`Transaction simulation failed: ${JSON.stringify(simulation.value.err)}`);
+          }
+        } catch (error) {
+          console.error("Simulation error, transaction may use address tables that don't exist:", error);
+          throw new Error("Transaction simulation failed. This may be due to address lookup tables not existing on devnet.");
+        }
       }
 
+      // Handle regular Transaction vs VersionedTransaction differently
+      if (transaction instanceof Transaction) {
+        transaction.feePayer = publicKey;
+        transaction.recentBlockhash = (
+          await this.connection.getLatestBlockhash()
+        ).blockhash;
+  
+        // If there are additional signers, get them to sign first
+        if (additionalSigners.length > 0) {
+          transaction.partialSign(...additionalSigners);
+        }
+      }
+      // Note: VersionedTransaction needs to be already properly set up
+      // We can't modify it here the same way
+
       // Get the user to sign the transaction
-      const signedTransaction = await signTransaction(transaction);
+      const signedTransaction = await signTransaction(transaction as Transaction);
 
       // Send the signed transaction
       const signature = await this.connection.sendRawTransaction(
@@ -91,7 +112,7 @@ export class TransactionService {
 
   // Helper method to sign, send, and confirm a transaction
   async signSendAndConfirmTransaction(
-    transaction: Transaction,
+    transaction: Transaction | VersionedTransaction,
     signTransaction: (transaction: Transaction) => Promise<Transaction>,
     publicKey: PublicKey,
     additionalSigners: Keypair[] = [],
@@ -121,4 +142,4 @@ export class TransactionService {
   }
 }
 
-export default TransactionService; 
+export default TransactionService;

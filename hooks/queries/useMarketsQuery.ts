@@ -2,10 +2,40 @@
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useMarketContract } from "@/hooks/useMarketContract";
-import { useMarketsStore, MarketFilters } from "@/store/marketsStore";
-import { MarketParams } from "@/services/contracts/models";
-import { PublicKey } from "@solana/web3.js";
+import { useMarketsStore, MarketFilters, MarketWithStats } from "@/store/marketsStore";
+import { Market, MarketParams, MarketStats } from "@/services/contracts/models";
+import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import { useTransactionStore } from "@/store/transactionStore";
+
+// Helper function to convert Market to MarketWithStats
+function convertToMarketWithStats(market: Market): MarketWithStats {
+  const totalAmount = market.yesAmount.add(market.noAmount);
+  
+  let yesPercentage = 0;
+  let noPercentage = 0;
+  
+  if (!totalAmount.isZero()) {
+    yesPercentage = (market.yesAmount.toNumber() / totalAmount.toNumber()) * 100;
+    noPercentage = (market.noAmount.toNumber() / totalAmount.toNumber()) * 100;
+  }
+  
+  const stats: MarketStats = {
+    totalPredictions: 0, // This would need data from the contract
+    yesPercentage,
+    noPercentage,
+    endTimestamp: new Date(market.endTimestamp.toNumber() * 1000),
+    resolvedTimestamp: market.resolvedTimestamp 
+      ? new Date(market.resolvedTimestamp.toNumber() * 1000) 
+      : undefined,
+    outcome: market.outcome,
+    liquidity: totalAmount.toNumber() / LAMPORTS_PER_SOL,
+  };
+  
+  return {
+    ...market,
+    stats
+  };
+}
 
 // Query keys for caching
 export const marketsQueryKeys = {
@@ -82,10 +112,13 @@ export function useMarketsQuery(filters: MarketFilters = {}) {
           }
         }
         
+        // Convert markets to MarketWithStats
+        const marketsWithStats = filteredMarkets.map(market => convertToMarketWithStats(market));
+        
         // Update state in the store
-        setMarkets(filteredMarkets);
+        setMarkets(marketsWithStats);
         setError(null);
-        return filteredMarkets;
+        return marketsWithStats;
       } catch (error) {
         console.error("Error fetching markets:", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";
@@ -115,7 +148,9 @@ export function useMarketQuery(address: string | null) {
         const market = await getMarket(marketPk);
         
         if (market) {
-          setCurrentMarket(market);
+          // Convert to MarketWithStats
+          const marketWithStats = convertToMarketWithStats(market);
+          setCurrentMarket(marketWithStats);
           setError(null);
         }
         
@@ -153,9 +188,12 @@ export function useUserMarketsQuery(userAddress: string | null) {
           m.creator.equals(userPk)
         );
         
-        setUserMarkets(userMarkets);
+        // Convert to MarketWithStats
+        const userMarketsWithStats = userMarkets.map(market => convertToMarketWithStats(market));
+        
+        setUserMarkets(userMarketsWithStats);
         setError(null);
-        return userMarkets;
+        return userMarketsWithStats;
       } catch (error) {
         console.error("Error fetching user markets:", error);
         const errorMessage = error instanceof Error ? error.message : "Unknown error";

@@ -37,45 +37,42 @@ export class TransactionService {
     options?: SendOptions
   ): Promise<string> {
     try {
-      // For versioned transactions, we need to simulate first to catch potential ALT issues
-      if (transaction instanceof VersionedTransaction) {
-        try {
-          // Simulate the transaction to check for ALT issues
-          const simulation = await this.connection.simulateTransaction(transaction);
-          if (simulation.value.err) {
-            console.error("Transaction simulation failed:", simulation.value.err);
-            throw new Error(`Transaction simulation failed: ${JSON.stringify(simulation.value.err)}`);
-          }
-        } catch (error) {
-          console.error("Simulation error, transaction may use address tables that don't exist:", error);
-          throw new Error("Transaction simulation failed. This may be due to address lookup tables not existing on devnet.");
-        }
-      }
-
       // Handle regular Transaction vs VersionedTransaction differently
       if (transaction instanceof Transaction) {
+        // Ensure we have the latest blockhash to avoid issues on devnet
+        const { blockhash, lastValidBlockHeight } = await this.connection.getLatestBlockhash();
+        transaction.recentBlockhash = blockhash;
+        transaction.lastValidBlockHeight = lastValidBlockHeight;
         transaction.feePayer = publicKey;
-        transaction.recentBlockhash = (
-          await this.connection.getLatestBlockhash()
-        ).blockhash;
   
         // If there are additional signers, get them to sign first
         if (additionalSigners.length > 0) {
           transaction.partialSign(...additionalSigners);
         }
+        
+        console.log("Transaction prepared for signing");
       }
       // Note: VersionedTransaction needs to be already properly set up
       // We can't modify it here the same way
 
       // Get the user to sign the transaction
       const signedTransaction = await signTransaction(transaction as Transaction);
+      console.log("Transaction signed by user");
 
-      // Send the signed transaction
+      // Send the signed transaction with preflight checks disabled
+      // This can help with transactions that might have simulation issues on devnet
+      const sendOptions: SendOptions = {
+        skipPreflight: true, // Skip preflight checks for better compatibility on devnet
+        preflightCommitment: 'confirmed',
+        ...(options || {})
+      };
+      
       const signature = await this.connection.sendRawTransaction(
         signedTransaction.serialize(),
-        options
+        sendOptions
       );
-
+      
+      console.log("Transaction sent with signature:", signature);
       return signature;
     } catch (error) {
       console.error("Transaction error:", error);

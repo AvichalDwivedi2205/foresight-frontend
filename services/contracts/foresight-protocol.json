@@ -1,0 +1,600 @@
+{
+  "version": "0.1.0",
+  "name": "contracts",
+  "instructions": [
+    {
+      "name": "createCreatorProfile",
+      "accounts": [
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creatorProfile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeAiResolver",
+      "accounts": [
+        {
+          "name": "admin",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "aiResolver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "resolveMarketViaAi",
+      "accounts": [
+        {
+          "name": "resolverAuthority",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "aiResolver",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "winningOutcomeIndex",
+          "type": "u8"
+        },
+        {
+          "name": "aiConfidenceScore",
+          "type": "f32"
+        },
+        {
+          "name": "resolutionData",
+          "type": "string"
+        }
+      ]
+    },
+    {
+      "name": "createMarket",
+      "accounts": [
+        {
+          "name": "creator",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "creatorProfile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "question",
+          "type": "string"
+        },
+        {
+          "name": "outcomes",
+          "type": {
+            "vec": "string"
+          }
+        },
+        {
+          "name": "aiScore",
+          "type": "f32"
+        },
+        {
+          "name": "aiRecommendedResolutionTime",
+          "type": "i64"
+        },
+        {
+          "name": "aiClassification",
+          "type": "u8"
+        },
+        {
+          "name": "creatorMetadata",
+          "type": "string"
+        },
+        {
+          "name": "creatorFeeBps",
+          "type": {
+            "option": "u16"
+          }
+        },
+        {
+          "name": "aiResolvable",
+          "type": {
+            "option": "bool"
+          }
+        }
+      ]
+    },
+    {
+      "name": "stakePrediction",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorProfile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prediction",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userProfile",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "outcomeIndex",
+          "type": "u8"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "claimReward",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "market",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "prediction",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "marketVault",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creatorTokenAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "protocolFeeAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userProfile",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "creatorProfile",
+          "isMut": true,
+          "isSigner": false,
+          "isOptional": true
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "initializeUserProfile",
+      "accounts": [
+        {
+          "name": "user",
+          "isMut": true,
+          "isSigner": true
+        },
+        {
+          "name": "userProfile",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Market",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "question",
+            "type": "string"
+          },
+          {
+            "name": "outcomes",
+            "type": {
+              "vec": "string"
+            }
+          },
+          {
+            "name": "aiScore",
+            "type": "f32"
+          },
+          {
+            "name": "marketType",
+            "type": "u8"
+          },
+          {
+            "name": "deadline",
+            "type": "i64"
+          },
+          {
+            "name": "aiSuggestedDeadline",
+            "type": "i64"
+          },
+          {
+            "name": "resolved",
+            "type": "bool"
+          },
+          {
+            "name": "winningOutcome",
+            "type": {
+              "option": "u8"
+            }
+          },
+          {
+            "name": "totalPool",
+            "type": "u64"
+          },
+          {
+            "name": "creatorFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "protocolFeeBps",
+            "type": "u16"
+          },
+          {
+            "name": "stakesPerOutcome",
+            "type": {
+              "vec": "u64"
+            }
+          },
+          {
+            "name": "aiResolvable",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Prediction",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "publicKey"
+          },
+          {
+            "name": "market",
+            "type": "publicKey"
+          },
+          {
+            "name": "outcomeIndex",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "timestamp",
+            "type": "i64"
+          },
+          {
+            "name": "claimed",
+            "type": "bool"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreatorProfile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "lastCreatedAt",
+            "type": "i64"
+          },
+          {
+            "name": "marketsCreated",
+            "type": "u32"
+          },
+          {
+            "name": "totalVolume",
+            "type": "u64"
+          },
+          {
+            "name": "tractionScore",
+            "type": "u64"
+          },
+          {
+            "name": "tier",
+            "type": "u8"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "UserProfile",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "publicKey"
+          },
+          {
+            "name": "totalStaked",
+            "type": "u64"
+          },
+          {
+            "name": "totalWinnings",
+            "type": "u64"
+          },
+          {
+            "name": "totalPredictions",
+            "type": "u32"
+          },
+          {
+            "name": "winningPredictions",
+            "type": "u32"
+          },
+          {
+            "name": "lastActiveTs",
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AIResolver",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "active",
+            "type": "bool"
+          },
+          {
+            "name": "resolutionCount",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "You are not authorized to perform this action."
+    },
+    {
+      "code": 6001,
+      "name": "InvalidMarketType",
+      "msg": "Invalid market type."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidDeadline",
+      "msg": "Deadline must be in the future."
+    },
+    {
+      "code": 6003,
+      "name": "CreatorOnCooldown",
+      "msg": "Creator is on cooldown. Wait before creating another market."
+    },
+    {
+      "code": 6004,
+      "name": "LowAIScore",
+      "msg": "AI score is too low for this market."
+    },
+    {
+      "code": 6005,
+      "name": "TooManyOutcomes",
+      "msg": "Too many outcomes provided. Maximum is 5."
+    },
+    {
+      "code": 6006,
+      "name": "InvalidOutcomeIndex",
+      "msg": "Invalid outcome index."
+    },
+    {
+      "code": 6007,
+      "name": "MarketAlreadyResolved",
+      "msg": "Market has already been resolved."
+    },
+    {
+      "code": 6008,
+      "name": "MarketExpired",
+      "msg": "Market has expired. The deadline has passed."
+    },
+    {
+      "code": 6009,
+      "name": "MarketNotResolved",
+      "msg": "Market has not been resolved yet."
+    },
+    {
+      "code": 6010,
+      "name": "WinningOutcomeRequired",
+      "msg": "Winning outcome must be provided for time-bound markets."
+    },
+    {
+      "code": 6011,
+      "name": "RewardAlreadyClaimed",
+      "msg": "Reward has already been claimed."
+    },
+    {
+      "code": 6012,
+      "name": "NoWinningOutcome",
+      "msg": "No winning outcome set."
+    },
+    {
+      "code": 6013,
+      "name": "NotWinningPrediction",
+      "msg": "Not a winning prediction."
+    },
+    {
+      "code": 6014,
+      "name": "InvalidDistribution",
+      "msg": "Invalid distribution."
+    }
+  ],
+  "metadata": {
+    "address": "7Gh4eFGmobz5ngu2U3bgZiQm2Adwm33dQTsUwzRb7wBi"
+  }
+}

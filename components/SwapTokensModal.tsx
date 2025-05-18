@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence  } from '@/components/motion';
 import { useJupiterSwap } from "@/hooks/useJupiterSwap";
 import { TokenInfo } from "@/services/contracts/models";
 import { useWallet } from "@solana/wallet-adapter-react";

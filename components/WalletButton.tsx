@@ -2,7 +2,7 @@
 
 import { useWallet } from "@solana/wallet-adapter-react";
 import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
-import { motion } from "framer-motion";
+import { motion  } from '@/components/motion';
 import { useState, useEffect } from "react";
 
 export const WalletButton = () => {

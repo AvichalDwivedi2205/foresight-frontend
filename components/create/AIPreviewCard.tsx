@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from 'framer-motion';
+import { motion  } from '@/components/motion';
 import { useState, useEffect } from 'react';
 
 interface AIPreviewCardProps {
@@ -9,6 +9,9 @@ interface AIPreviewCardProps {
     valid: boolean;
     score: number;
     summary: string;
+    marketType?: number;
+    suggestedEndDate?: Date;
+    error?: string; // Added error field
   } | null;
 }
 
@@ -44,38 +47,34 @@ export default function AIPreviewCard({ isValidating, validationResult }: AIPrev
     return null;
   }
   
+  // Determine if there's an API quota error
+  const hasQuotaError = validationResult?.error && 
+    (validationResult.error.includes("quota") || 
+     validationResult.error.includes("429") || 
+     validationResult.error.includes("rate limit"));
+
   return (
     <motion.div
-      className="mt-8 mb-8 bg-[#151518] rounded-lg border border-white/10 p-6"
+      className="bg-[#181820] border border-white/10 rounded-xl p-5"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="flex items-center mb-4">
-        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-          isValidating ? 'bg-amber-500/20' : 
-          validationResult?.valid ? 'bg-green-500/20' : 'bg-red-500/20'
-        }`}>
+      <div className="flex items-start">
+        <div className="w-12 h-12 rounded-full bg-[#0E0E10] border border-[#5F6FFF]/30 flex items-center justify-center mr-4 flex-shrink-0">
           {isValidating ? (
-            <motion.div 
-              className="w-6 h-6 border-t-2 border-amber-500 rounded-full"
-              animate={{ rotate: 360 }}
-              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            />
+            <div className="w-5 h-5 border-2 border-[#5F6FFF] border-t-transparent rounded-full animate-spin"></div>
           ) : validationResult?.valid ? (
-            <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
-            </svg>
+            <span className="text-[#5F6FFF] text-xl">✓</span>
           ) : (
-            <svg className="w-6 h-6 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
+            <span className="text-red-400 text-xl">✕</span>
           )}
         </div>
         
-        <div className="ml-3">
+        <div>
           <h3 className="text-lg font-medium text-white">
             {isValidating ? "AI Validation in Progress" : 
+             hasQuotaError ? "Local Validation Used" :
              validationResult?.valid ? "Validated by AI" : "AI Validation Failed"}
           </h3>
           
@@ -100,7 +99,7 @@ export default function AIPreviewCard({ isValidating, validationResult }: AIPrev
               {validationResult.valid ? (
                 <>
                   <span className="mr-1">✓</span>
-                  <span>{Math.round(validationResult.score * 100)}% clear & objective</span>
+                  <span>{Math.round(validationResult.score)}% {hasQuotaError ? "passing basic checks" : "clear & objective"}</span>
                 </>
               ) : (
                 <>
@@ -109,6 +108,13 @@ export default function AIPreviewCard({ isValidating, validationResult }: AIPrev
                 </>
               )}
             </motion.div>
+          )}
+          
+          {hasQuotaError && !isValidating && (
+            <div className="mt-2 text-xs text-amber-400 bg-amber-500/10 px-3 py-2 rounded-md">
+              <span className="font-medium">API quota exceeded.</span> Using local validation instead. 
+              Consider upgrading your Gemini API plan for AI-powered validation.
+            </div>
           )}
         </div>
       </div>

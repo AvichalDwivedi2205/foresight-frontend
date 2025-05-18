@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from 'react';
-import { motion, useInView, useAnimation, animate } from 'framer-motion';
+import { motion, useInView, useAnimation, animate  } from '@/components/motion';
 
 interface ProfileStatsProps {
   stats: {

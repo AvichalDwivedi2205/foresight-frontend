@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion  } from '@/components/motion';
 import MarketCard from "./MarketCard";
 import SkeletonCard from "./SkeletonCard";
 

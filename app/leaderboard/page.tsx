@@ -1,7 +1,7 @@
 "use client";
 
 import { useReducer, useCallback, useMemo, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence  } from '@/components/motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import LeaderboardHeader from '../../components/leaderboard/LeaderboardHeader';

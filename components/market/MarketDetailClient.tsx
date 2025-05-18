@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion  } from '@/components/motion';
 import MarketDetailsHeader from "@/components/market/MarketDetailsHeader";
 import OutcomeOptions from "@/components/market/OutcomeOptions";
 import StakeBox from "@/components/market/StakeBox";

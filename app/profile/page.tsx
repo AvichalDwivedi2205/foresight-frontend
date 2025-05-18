@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion  } from '@/components/motion';
 import Navbar from '../../components/Navbar';
 import Footer from '../../components/Footer';
 import ProfileHeader from '../../components/profile/ProfileHeader';

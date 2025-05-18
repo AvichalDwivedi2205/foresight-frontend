@@ -1,7 +1,10 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence  } from '@/components/motion';
+import TokenSelector from './TokenSelector';
+import CalendarPicker from './CalendarPicker';
+import { TokenInfo } from '@/services/contracts/models';
 
 interface CreateMarketFormProps {
   formData: {
@@ -10,6 +13,7 @@ interface CreateMarketFormProps {
     endDate: string;
     outcomes: string[];
     initialStake: string;
+    tokenInfo?: TokenInfo;
   };
   onChange: (data: any) => void;
   onValidateSubmit: () => void;
@@ -33,6 +37,7 @@ export default function CreateMarketForm({
     endDate?: string;
     outcomes?: string;
     initialStake?: string;
+    tokenInfo?: string;
   }>({});
   
   // Update character count when market question changes
@@ -51,14 +56,29 @@ export default function CreateMarketForm({
     }
   };
   
-  // Handle date input changes
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    onChange({ endDate: value });
+  // Handle date selection from calendar
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      // Set time to end of day (11:59:59 PM)
+      date.setHours(23, 59, 59, 999);
+      onChange({ endDate: date.toISOString() });
+    } else {
+      onChange({ endDate: '' });
+    }
     
     // Clear errors for this field
     if (errors.endDate) {
       setErrors(prev => ({ ...prev, endDate: undefined }));
+    }
+  };
+
+  // Handle token selection
+  const handleTokenChange = (token: TokenInfo) => {
+    onChange({ tokenInfo: token });
+    
+    // Clear errors for token
+    if (errors.tokenInfo) {
+      setErrors(prev => ({ ...prev, tokenInfo: undefined }));
     }
   };
   
@@ -97,6 +117,7 @@ export default function CreateMarketForm({
       endDate?: string;
       outcomes?: string;
       initialStake?: string;
+      tokenInfo?: string;
     } = {};
     
     // Check market question (required, min length)
@@ -131,6 +152,11 @@ export default function CreateMarketForm({
     // Check initial stake (must be a number if provided)
     if (formData.initialStake && isNaN(Number(formData.initialStake))) {
       newErrors.initialStake = 'Initial stake must be a valid number';
+    }
+    
+    // Check token info
+    if (!formData.tokenInfo) {
+      newErrors.tokenInfo = 'Token is required';
     }
     
     setErrors(newErrors);
@@ -226,26 +252,16 @@ export default function CreateMarketForm({
       {/* End Date Field */}
       <div className="mb-6">
         <label className="block text-[#F5F5F5] font-medium mb-2" htmlFor="endDate">
-          Resolution Date & Time *
+          Resolution Date *
         </label>
-        <motion.input
-          type="datetime-local"
-          id="endDate"
-          name="endDate"
-          value={formData.endDate}
+        <CalendarPicker
+          selectedDate={formData.endDate ? new Date(formData.endDate) : null}
           onChange={handleDateChange}
-          className={`w-full bg-[#0E0E10] border ${
-            errors.endDate ? 'border-red-500' : 'border-white/20'
-          } text-white rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-[#5F6FFF]`}
-          min={new Date().toISOString().slice(0, 16)}
+          minDate={new Date()} // Cannot select dates in the past
+          maxDate={new Date(Date.now() + 1000 * 60 * 60 * 24 * 365 * 10)} // 10 years in the future max
+          placeholder="Select resolution date"
+          error={errors.endDate}
           disabled={isValidating || isValidated}
-          animate={{
-            boxShadow: errors.endDate 
-              ? '0 0 0 2px rgba(239, 68, 68, 0.2)' 
-              : formData.endDate 
-              ? '0 0 10px rgba(95, 111, 255, 0.3)'
-              : 'none'
-          }}
         />
         {errors.endDate && (
           <motion.p 
@@ -334,6 +350,30 @@ export default function CreateMarketForm({
         </p>
       </div>
 
+      {/* Token Selection */}
+      <div className="mb-6">
+        <label className="block text-[#F5F5F5] font-medium mb-2">
+          Market Token *
+        </label>
+        <TokenSelector
+          value={formData.tokenInfo}
+          onChange={handleTokenChange}
+          disabled={isValidating || isValidated}
+        />
+        {errors.tokenInfo && (
+          <motion.p 
+            className="mt-1 text-red-500 text-sm"
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            {errors.tokenInfo}
+          </motion.p>
+        )}
+        <p className="mt-2 text-[#B0B0B0] text-sm">
+          Select the token that will be used for staking and rewards in this market.
+        </p>
+      </div>
+
       {/* Initial Stake Field */}
       <div className="mb-8">
         <label className="block text-[#F5F5F5] font-medium mb-2" htmlFor="initialStake">
@@ -360,7 +400,7 @@ export default function CreateMarketForm({
             }}
           />
           <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <span className="text-[#B0B0B0]">SOL</span>
+            <span className="text-[#B0B0B0]">{formData.tokenInfo?.symbol || 'SOL'}</span>
           </div>
         </div>
         {errors.initialStake && (

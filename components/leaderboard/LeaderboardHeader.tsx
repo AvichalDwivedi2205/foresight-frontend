@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from 'framer-motion';
+import { motion  } from '@/components/motion';
 
 interface LeaderboardHeaderProps {
   timeFrame: 'all' | 'weekly' | 'monthly';

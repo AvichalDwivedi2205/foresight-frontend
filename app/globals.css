@@ -98,3 +98,77 @@ body {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
+
+/* Custom styles for react-datepicker to match Foresight Protocol theme */
+.react-datepicker {
+  font-family: inherit;
+  background-color: #151518 !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.react-datepicker__header {
+  background-color: #151518 !important;
+  border-bottom-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.react-datepicker__current-month,
+.react-datepicker__day-name,
+.react-datepicker-time__header {
+  color: #ffffff !important;
+}
+
+.react-datepicker__day {
+  color: #ffffff !important;
+}
+
+.react-datepicker__day:hover {
+  background-color: rgba(95, 111, 255, 0.2) !important;
+  color: white !important;
+  border-radius: 9999px !important;
+}
+
+.react-datepicker__day--selected,
+.react-datepicker__day--keyboard-selected {
+  background: linear-gradient(90deg, #5F6FFF 0%, #13ADC7 100%) !important;
+  border-radius: 9999px !important;
+  color: white !important;
+  font-weight: bold;
+}
+
+.react-datepicker__day--disabled {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+.react-datepicker__day--outside-month {
+  color: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Today highlight */
+.react-datepicker__day--today {
+  font-weight: bold;
+  border: 1px solid rgba(95, 111, 255, 0.5) !important;
+  border-radius: 9999px !important;
+}
+
+/* Week header row */
+.react-datepicker__day-name {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-weight: 500;
+}
+
+/* Animation for calendar */
+.react-datepicker-popper {
+  animation: datepickerFadeIn 0.2s ease-out forwards;
+  z-index: 50 !important;
+}
+
+@keyframes datepickerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

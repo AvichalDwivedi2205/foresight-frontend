@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion  } from '@/components/motion';
 import { useInView } from "react-intersection-observer";
 
 const fadeIn = {
